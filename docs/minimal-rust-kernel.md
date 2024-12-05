@@ -46,3 +46,21 @@ For our target system, however, we require some special configuration parameters
     "morestack": false
 }
 ```
+### building our kernel
+the problems is that the core library is distributed with together the rust compiler as a precompile library. so it's only valid for supported host triples(`x86_64-unknown-linux-gnu`) so if we want to compile code for other target, we need to recompile core library. \n
+
+`build-std option`
+`build-std feature` of cargo comes in. it allows to recompile `core` and other standard library, instead of using the precompiled version shipped with the rust installation. \n
+```toml
+# in .cargo/config.toml
+[unstable]
+build-std = ["core", "compiler_builtins"]
+```
+
+### creating a bootimage
+`How does it work?`
+The bootimage tool performs the following steps behind the scenes: \n
+
+- It compiles our kernel to an ELF file.
+- It compiles the bootloader dependency as a standalone executable.
+- It links the bytes of the kernel ELF file to the bootloader.
