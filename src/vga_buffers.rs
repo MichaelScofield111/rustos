@@ -66,5 +66,56 @@ pub struct Write {
     color_code: ColorCode,
     // The 'static lifetime specifies that the reference is valid
     // for the whole program run time
-    buffer: &'static mut buffer,
+    buffer: &'static mut Buffer,
+}
+
+//. Printing
+impl Write {
+    /// Now we can use the Writer to modify the buffer’s characters.
+    pub fn write_byte(&mut self, byte: u8) {
+        match byte {
+            b'\n' => self.new_line(),
+            byte => {
+                if self.column_position >= BUFFER_WIDTH {
+                    self.new_line();
+                }
+
+                let row = BUFFER_HEIGHT - 1;
+                let col = self.column_position;
+
+                let color_code = self.color_code;
+                // write last line of buffer
+                self.buffer.chars[row][col] = ScreenChar {
+                    ascii_char: byte,
+                    color_code: color_code,
+                };
+                self.column_position += 1;
+            }
+        }
+    }
+    ///To print whole strings,we can convert them to bytes
+    /// and print them one-by-one:
+    pub fn write_str(&mut self, s: &str) {
+        for byte in s.bytes() {
+            // special judge
+            match byte {
+                0x20..=0x7e | b'\n' => self.write_byte(byte),
+                _ => self.write_byte(0xfe),
+            }
+        }
+    }
+
+    fn new_line(&mut self) {
+        todo!()
+    }
+}
+
+/// try it out!
+pub fn print_something() {
+    let mut write = Write {
+        column_position: 0,
+        color_code: ColorCode::new(Color::Green, Color::Black),
+        buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
+    };
+    write.write_str("Hello, world!");
 }

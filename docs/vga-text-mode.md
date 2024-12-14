@@ -4,7 +4,7 @@ the vga text mode is a simple way to print text to the screen.
 ```
 ### The VGA Text Buffer
 ```text
-The VGA text buffer is a two-dimensional array with 25 rows and  80 columns, witch is directly rendered to the screen. Each array entry describes a single screen character through the following format:
+The VGA text buffer is a two-dimensional array with 25 rows and  80 columns, witch is directly rendered to the screen. \n Each array entry describes a single screen character through the following format:
 ```
 | (Bits) | (Value)          |
 |--------|------------------|
@@ -14,5 +14,5 @@ The VGA text buffer is a two-dimensional array with 25 rows and  80 columns, wit
 | 15        | blink               |
 
 ```text
-The VGA text buffer is accessible via memory-mapped I/O to the address `0xb8000`. this means that reads and writes to that addrsss don't access the RAM but directly access the text buffer on the VGA hardware.
+The VGA text buffer is accessible via memory-mapped I/O to the address `0xb8000`. \n this means that reads and writes to that addrsss don't access the RAM but directly access the text buffer on the VGA hardware.
 ```
