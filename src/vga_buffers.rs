@@ -1,3 +1,5 @@
+use core::fmt;
+use volatile::Volatile;
 // #[allow(warnings)]
 // restrict warnings
 
@@ -57,11 +59,11 @@ const BUFFER_WIDTH: usize = 80;
 
 /// the screen struct
 struct Buffer {
-    chars: [[ScreenChar; BUFFER_WIDTH]; BUFFER_HEIGHT],
+    chars: [[Volatile<ScreenChar>; BUFFER_WIDTH]; BUFFER_HEIGHT],
 }
 
 /// To actually write to screen, we now create a writer type:
-pub struct Write {
+pub struct Writer {
     column_position: usize, // ciurrent column position
     color_code: ColorCode,
     // The 'static lifetime specifies that the reference is valid
@@ -69,8 +71,16 @@ pub struct Write {
     buffer: &'static mut Buffer,
 }
 
+/// support Formatting Macros
+impl fmt::Write for Writer {
+    fn write_str(&mut self, s: &str) -> fmt::Result {
+        self.write_str(s);
+        Ok(())
+    }
+}
+
 //. Printing
-impl Write {
+impl Writer {
     /// Now we can use the Writer to modify the buffer’s characters.
     pub fn write_byte(&mut self, byte: u8) {
         match byte {
@@ -85,10 +95,10 @@ impl Write {
 
                 let color_code = self.color_code;
                 // write last line of buffer
-                self.buffer.chars[row][col] = ScreenChar {
+                self.buffer.chars[row][col].write(ScreenChar {
                     ascii_char: byte,
                     color_code: color_code,
-                };
+                });
                 self.column_position += 1;
             }
         }
@@ -105,17 +115,42 @@ impl Write {
         }
     }
 
+    // new line  in the screen
     fn new_line(&mut self) {
-        todo!()
+        for row in 1..BUFFER_HEIGHT {
+            for col in 0..BUFFER_WIDTH {
+                let character = self.buffer.chars[row][col].read();
+                self.buffer.chars[row - 1][col].write(character);
+            }
+        }
+        self.clear_row(BUFFER_HEIGHT - 1);
+        self.column_position = 0;
+    }
+
+    // clear last line of buffer
+    fn clear_row(&mut self, row: usize) {
+        let blank = ScreenChar {
+            ascii_char: b' ',
+            color_code: self.color_code,
+        };
+
+        for col in 0..BUFFER_WIDTH {
+            self.buffer.chars[row][col].write(blank);
+        }
     }
 }
 
 /// try it out!
 pub fn print_something() {
-    let mut write = Write {
+    use core::fmt::Write;
+    let mut writer = Writer {
         column_position: 0,
         color_code: ColorCode::new(Color::Green, Color::Black),
         buffer: unsafe { &mut *(0xb8000 as *mut Buffer) },
     };
-    write.write_str("Hello, world!");
+    writer.write_byte(b'H');
+    writer.write_str("ello! ");
+    writer.write_str("stay with me\n");
+    // write! macro
+    write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
 }
