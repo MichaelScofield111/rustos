@@ -24,7 +24,19 @@ pub extern "C" fn _start() -> ! {
     //         *vga_buffer.offset(i as isize * 2 + 1) = 0xb;
     //     }
     // }
-    vga_buffers::print_something();
+    // test
+    //vga_buffers::print_something();
+
+    use core::fmt::Write;
+    println!("test println macro");
+    vga_buffers::WRITER.lock().write_str("Hello rust-os!");
+    write!(
+        vga_buffers::WRITER.lock(),
+        ", some numbers: {} {}",
+        42,
+        1.337
+    )
+    .unwrap();
 
     loop {}
 }
