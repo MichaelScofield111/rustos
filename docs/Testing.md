@@ -17,7 +17,15 @@ error[E0463]: can't find crate for `test`
 ```
 
 
-### Custom test framework
+#### Custom test framework
 Rust supports replacing the default custom test frameworks through the unstable `custom_test_frameworks` feature. this feature requires no externel libraries and can work in `no_std` environments.
 <br>
 It works by collecting all functions annotated with a #[test_case] attribute and then invoking a user-specified runner function with the list of tests as an argument. 
+
+### Printing to the console
+To see the test output on the console, we need to send the data from our kernel to the host system. There are several ways to do this.
+#### serial port
+A simple way to send the data is to use the `serial port`
+It's easy to program and QEMU can redirect the bytes sent over serial to the host's standard output or a file.
+<br>
+the chips implementing a serial port usually are called `UARTs`. The common UARTs today are all compatible with the 16550 UART, so we will use that model for our testing framework.
