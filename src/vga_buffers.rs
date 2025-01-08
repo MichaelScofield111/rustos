@@ -185,3 +185,13 @@ pub fn _print_something() {
     // write! macro
     write!(writer, "The numbers are {} and {}", 42, 1.0 / 3.0).unwrap();
 }
+
+#[test_case]
+fn test_println_ouput() {
+    let s = "Some test string that files on a single line";
+    println!("{}", s);
+    for (i, c) in s.chars().enumerate() {
+        let screen_char = WRITER.lock().buffer.chars[BUFFER_HEIGHT - 2][i].read();
+        assert_eq!(char::from(screen_char.ascii_char), c);
+    }
+}

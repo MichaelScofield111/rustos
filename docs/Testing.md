@@ -29,3 +29,19 @@ A simple way to send the data is to use the `serial port`
 It's easy to program and QEMU can redirect the bytes sent over serial to the host's standard output or a file.
 <br>
 the chips implementing a serial port usually are called `UARTs`. The common UARTs today are all compatible with the 16550 UART, so we will use that model for our testing framework.
+
+
+### Integration testing
+the convention for `intergration testing` in Rust it to put them into a `test` directory in the project root(src).
+Both the default test framework and custom test frameworks will automatically pick up and execute all tests in that directory.
+<br>
+All integration tests are their own executables and completely separate from our `main.rs`.This means that each test needs to define its own entry point function.
+
+### Creare a Library
+To make the required functions available to our tests. we need to split off a library from our main.rs, which can be included by other crates and integration test executables. To do this, we create a new src/lib.rs file:
+<br>
+like the `main.rs`, the `lib.rs` is special file that automatically recognized by cargo. the library is a separate compilation unit (but not like main.rs 是一个二进制单元是一个库)
+
+
+
+
