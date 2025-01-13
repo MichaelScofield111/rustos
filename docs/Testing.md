@@ -45,3 +45,5 @@ like the `main.rs`, the `lib.rs` is special file that automatically recognized b
 
 
 
+### completing the integration test
+like our `src/mian.rs`, out `tests/basic_boot.rs` executable can import types from our new library.
