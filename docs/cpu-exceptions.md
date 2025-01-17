@@ -79,7 +79,7 @@ Options 字段的格式
 ### 中断栈帧
 当一个常规函数调用发生时（使用 call 指令），CPU会在跳转目标函数之前，将返回地址入栈。当函数返回时（使用 ret 指令），CPU会在跳回目标函数之前弹出返回地址。所以常规函数调用的栈帧看起来是这样的：
 <div align="center">  
-  <img width="400" alt="图片描述" src="../assets/stack1.png">  
+  <img width="400" alt="图片描述" src="../asset/stack1.png">  
 </div>
 对于错误和中断处理函数，仅仅压入一个返回地址并不足够，因为中断处理函数通常会运行在一个不那么一样的上下文中（栈指针、CPU flags等等）。所以CPU在遇到中断发生时是这么处理的：
 1. 对齐栈指针: 任何指令都有可能触发中断，所以栈指针可能是任何值，而部分CPU指令（比如部分SSE指令）需要栈指针16字节边界对齐，因此CPU会在中断触发后立刻为其进行对齐。
@@ -91,7 +91,7 @@ Options 字段的格式
 6. 执行中断处理函数: CPU会读取对应IDT条目中描述的中断处理函数对应的地址和段描述符，将两者载入 rip 和 cs 以开始运行处理函数。
 所以 中断栈帧 看起来是这样的：
 <div align="center">  
-  <img width="400" alt="图片描述" src="../assets/stack2.png">  
+  <img width="400" alt="图片描述" src="../asset/stack2.png">  
 </div>
 在 x86_64 crate 中，中断栈帧已经被 InterruptStackFrame 结构完整表达，该结构会以 &mut 的形式传入处理函数，并可以用于查询错误发生的更详细的原因。但该结构并不包含错误码字段，因为只有极少量的错误会传入错误码，所以对于这类需要传入 error_code 的错误，其函数类型变为了 HandlerFuncWithErrCode。
 
